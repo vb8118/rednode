@@ -1,0 +1,27 @@
+{
+  "name": "rednode",
+  "version": "1.0.0",
+  "description": "example from node redis",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vb8118/rednode.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vb8118/rednode/issues"
+  },
+  "homepage": "https://github.com/vb8118/rednode#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "express-handlebars": "^3.0.0",
+    "method-override": "^2.3.9",
+    "morgan": "^1.8.2",
+    "redis": "^2.8.0"
+  }
+}
