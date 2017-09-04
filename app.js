@@ -58,12 +58,25 @@ app.post('/user/search', function(req, res, next){
 
 //services list
 app.get('/user/services', function(req, res, next){
-	const { spawn } = require('child_process');
-	const bat = spawn('powershell.exe', ['/c', 'get-service']);
-	bat.stdout.on('data',(data)=>{
-		console.log(data.toString());
+	//const { spawn } = require('child_process');
+	//const bat = spawn('powershell.exe', ['/c', 'get-service']);
+	//bat.stdout.on('data',(data) => {
+		//console.log(`${data}`);
+	//});
+	const { exec } = require('child_process');
+	exec('powershell.exe get-service', (err, stdout, stderr) => {
+	  if (err) {
+	    console.error(err);
+	    return;
+	  }
+	  console.log(stdout);
+	  res.render('services', {
+			data: stdout
+			
+		});
 	});
-	res.render('services', data);
+	
+
 	
 });
 
