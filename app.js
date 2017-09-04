@@ -12,8 +12,8 @@ const port = 3000;
 var app = express();
  
 //view engine
-app.engine('hbs', exphbs({defaultLayout:'main'}));
-app.set('view engine', 'hbs');
+app.engine('handlebars', exphbs({defaultLayout:'main'}));
+app.set('view engine', 'handlebars');
 
 //body-parser
 app.use (bodyparser.json());
@@ -26,5 +26,5 @@ app.get('/', function(req, res, next){
 });
 
 app.listen(port, function(){
-	console.log('server started on port: '+ port);
+		console.log('server started on port: '+ port);
 });
