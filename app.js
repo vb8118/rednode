@@ -56,6 +56,18 @@ app.post('/user/search', function(req, res, next){
 	
 });
 
+//services list
+app.get('/user/services', function(req, res, next){
+	const { spawn } = require('child_process');
+	const bat = spawn('powershell.exe', ['/c', 'get-service']);
+	bat.stdout.on('data',(data)=>{
+		console.log(data.toString());
+	});
+	res.render('services', data);
+	
+});
+
+
 app.listen(port, function(){
 		console.log('server started on port: '+ port);
 });
