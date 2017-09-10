@@ -5,6 +5,7 @@ var bodyparser = require('body-parser');
 var methodOverride = require ('method-override');
 var redis = require('redis');
 var morgan = require('morgan');
+var Table = require('easy-table');
 
 //set port
 const port = 3000;
@@ -69,9 +70,18 @@ app.get('/user/services', function(req, res, next){
 	    console.error(err);
 	    return;
 	  }
-	  console.log(stdout);
+	  //console.log(stdout);
+	  
+	  var array = stdout.toString().split("\n");
+	  for (i in array){
+		  line = array[i].split(" ");
+		  //var arrobj = { 
+		  //}
+			  console.log (line);
+			  }
+			  
 	  res.render('services', {
-			data: stdout
+			data: array
 			
 		});
 	});
