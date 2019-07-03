@@ -6,3 +6,97 @@
 	</div>
 	<input type="submit" class="btn btn-primary" value="Search">
 </form>
+
+!-- Stream video via webcam -->
+<div class="video-wrap">
+    <video id="video" playsinline autoplay></video>
+</div>
+
+<!-- Trigger canvas web API -->
+<div class="controller">
+    <button id="snap">Capture</button>
+</div>
+
+<!-- Webcam video snapshot -->
+<canvas id="canvas" width="640" height="480"></canvas>
+
+<button id="save">Save</button>
+
+<script>
+	'use strict';
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const snap = document.getElementById("snap");
+const errorMsgElement = document.querySelector('span#errorMsg');
+const button = document.getElementById('save');
+
+const constraints = {
+  audio: true,
+  video: {
+    width: 1280, height: 720
+  }
+};
+
+// Access webcam
+async function init() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    handleSuccess(stream);
+  } catch (e) {
+    errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
+  }
+}
+// Success
+function handleSuccess(stream) {
+  window.stream = stream;
+  video.srcObject = stream;
+}
+// Load init
+init();
+// Draw image
+var context = canvas.getContext('2d');
+
+snap.addEventListener("click", function() {
+	context.drawImage(video, 0, 0, 300, 300);
+});
+
+var imgdata = canvas.toDataURL('image/png');
+// modify the dataUrl so the browser starts downloading it instead of just showing it
+var newdata = imgdata.replace(/^data:image\/png/,'data:application/octet-stream');
+
+console.log("canvas to datURL:" + imgdata);
+console.log("new data post imgdata.replace:" + newdata);
+
+button.addEventListener('click', async _ => {
+  try {     
+    const response = await fetch('/captureImage', {
+      method: 'post',
+      body: {
+               newdata
+      }
+    });
+    console.log('Completed!', response);
+  } catch(err) {
+    console.error(`Error: ${err}`);
+  }
+});
+
+</script>
+
+
+
+<!--
+<div class="container" id="Cool" ng-app="mainApp" ng-controller="formController">
+	<h2>Capture your image from webcam</h2>
+	<div class="row">
+		<div class="col-md-6">
+			<video controls autoplay></video>
+		</div>
+		<div class="col-md-6"></div>
+			<canvas id="myCanvas" width="200" height="200" style="border:1px solid">
+		</div>
+	</div>
+
+</div>
+-->

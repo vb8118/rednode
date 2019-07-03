@@ -1,0 +1,106 @@
+<h1>Search Users</h1>
+{{#if error}} <span>{{error}}</span>{{/if}}
+<form class="form-inline" method="POST" action="/user/search">
+	<div class="form-group">
+		<input type="text" name="id" class="form-control" placeholder="Search by user ID">
+	</div>
+	<input type="submit" class="btn btn-primary" value="Search">
+</form>
+
+<script src="static/js/angular.js"></script>
+<script>
+	'use strict';
+
+     window.addEventListener("DOMContentLoaded", function() {
+      // Grab elements, create settings, etc.
+      var canvas = document.getElementById("canvas"),
+      context = canvas.getContext("2d"),
+      video = document.getElementById("video"),
+      videoObj = { "video": true },
+      errBack = function(error) {
+      console.log("Video capture error: ", error.code);
+      };
+      // Put video listeners into place
+      if(navigator.getUserMedia) { // Standard
+      navigator.getUserMedia(videoObj, function(stream) {
+      video.src = stream;
+      video.play();
+      }, errBack);
+      } else if(navigator.webkitGetUserMedia) { // WebKit-prefixed
+      navigator.webkitGetUserMedia(videoObj, function(stream){
+      video.src = window.URL.createObjectURL(stream);
+      video.play();
+      }, errBack);
+      } else if(navigator.mozGetUserMedia) { // WebKit-prefixed
+      navigator.mozGetUserMedia(videoObj, function(stream){
+      video.src = window.URL.createObjectURL(stream);
+      video.play();
+      }, errBack);
+      }
+      // Trigger photo take
+      document.getElementById("snap").addEventListener("click", function() {
+      context.drawImage(video, 0, 0, 640, 480);
+      // Littel effects
+      //$('#video').fadeOut('slow');
+      $('#canvas').fadeIn('slow');
+      //$('#snap').hide();
+      //$('#new').show();
+      // Allso show upload button
+      //$('#upload').show();
+      });
+      // Capture New Photo
+      document.getElementById("new").addEventListener("click", function() {
+      //$('#video').fadeIn('slow');
+      //$('#canvas').fadeOut('slow');
+      //$('#snap').show();
+      //$('#new').hide();
+      });
+      // Upload image to sever
+      document.getElementById("upload").addEventListener("click", function(){
+      var dataUrl = canvas.toDataURL();
+       console.log(dataUrl);
+		
+      });
+      }, false);   
+   var mainApp = angular.module("mainApp", []);
+   mainApp.controller("formController", function($scope, $http) {
+       $scope.uploadImage = function () {
+         var request = $http({
+            method: "post",
+            url:  "/captureImage",
+            data: {
+               base64: document.getElementById("canvas").toDataURL()
+            },
+            headers: { 'Content-Type': 'application/json' }
+          });
+        request.success(function (data) {
+          console.log(data);
+        });
+        request.error(function(serverResponse, status, headers, config) {
+           alert("failure");
+        });
+      };
+   });
+
+
+</script>
+
+
+<div class="container" id="Cool" ng-app="mainApp" ng-controller="formController">
+	<h2>Capture your image from webcam</h2>
+	<div class="row">
+		<div class="col-md-6">
+			<video controls autoplay></video>
+		</div>
+		<div class="col-md-6"></div>
+			<canvas id="myCanvas" width="200" height="200" style="border:1px solid">
+		</div>
+	</div>
+
+<button id="snap" type="button">Capture</button>
+<button id="new"> New </button>	
+<button id="upload" onclick="uploadImage()">Upload</button> 
+
+</div>
+
+

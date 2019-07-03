@@ -8,7 +8,7 @@ var morgan = require('morgan');
 var Table = require('easy-table');
 
 //set port
-const port = 3000;
+const port = 3001;
 
 //init app
 var app = express();
@@ -88,6 +88,23 @@ app.get('/user/services', function(req, res, next){
 	
 
 	
+});
+
+
+app.get('/captureImage', function(req, res, next) {
+	res.render('captureImage', { title: 'Capture Image and upload' });
+});
+
+app.post('/captureImage', function(req, res, next) {
+	console.log("FormData "+ req.body.base64);
+//	var base64Data = req.body.base64.replace(/^data:image\/png;base64,/, "");
+	fs.writeFile("uploads/out.png", base64Data, 'base64', function(err) {
+		if(err){
+			console.log("Error in writing: " + err);
+			}else{
+			res.send(JSON.stringify({'status': 1, 'msg': 'Image Uploaded'}));
+		}
+	});
 });
 
 
