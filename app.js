@@ -5,7 +5,8 @@ var bodyparser = require('body-parser');
 var methodOverride = require ('method-override');
 var redis = require('redis');
 var morgan = require('morgan');
-var Table = require('easy-table');
+var fs = require('file-system');
+var base64ToImage = require('base64-to-image');
 
 //set port
 const port = 3001;
@@ -85,28 +86,35 @@ app.get('/user/services', function(req, res, next){
 			
 		});
 	});
-	
-
-	
 });
-
 
 app.get('/captureImage', function(req, res, next) {
 	res.render('captureImage', { title: 'Capture Image and upload' });
 });
 
 app.post('/captureImage', function(req, res, next) {
-	console.log("FormData "+ req.body.base64);
-//	var base64Data = req.body.base64.replace(/^data:image\/png;base64,/, "");
-	fs.writeFile("uploads/out.png", base64Data, 'base64', function(err) {
-		if(err){
-			console.log("Error in writing: " + err);
-			}else{
-			res.send(JSON.stringify({'status': 1, 'msg': 'Image Uploaded'}));
-		}
-	});
-});
+	var postData = req.body.url;
+	//console.log("FormData "+ postData);
+	//var buff = new Buffer(postData, 'base64');
+//	let text = buff.toString('ascii');
 
+var base64Str = postData;
+var path ='uploads/';
+var optionalObj = {'fileName': 'out', 'type':'png'};
+
+base64ToImage(base64Str,path,optionalObj);
+
+
+//	var base64Data = req.body.url.replace(/^data:image\/png;base64,/, "");
+//	fs.writeFile("uploads/out.png", base64Data, 'base64', function(err) {
+// 	fs.writeFile("uploads/out.png", buff.data, function(err) {
+// 		if(err){
+// 			console.log("Error in writing: " + err);
+// 			}else{
+// 			res.send(JSON.stringify({'status': 1, 'msg': 'Image Uploaded'}));
+// 		}
+// 	});
+ });
 
 app.listen(port, function(){
 		console.log('server started on port: '+ port);

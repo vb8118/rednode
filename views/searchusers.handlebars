@@ -1,40 +1,35 @@
-<h1>Search Users</h1>
+<div class="jumbotron">
+
+<h1>Capture Image</h1>
 {{#if error}} <span>{{error}}</span>{{/if}}
-<form class="form-inline" method="POST" action="/user/search">
-	<div class="form-group">
-		<input type="text" name="id" class="form-control" placeholder="Search by user ID">
-	</div>
-	<input type="submit" class="btn btn-primary" value="Search">
-</form>
 
-!-- Stream video via webcam -->
-<div class="video-wrap">
+<!-- Stream video via webcam -->
+<div class="row">
+  <div class="video-wrap col-md-6">
     <video id="video" playsinline autoplay></video>
-</div>
+    <!-- Trigger canvas web API -->
+    <div class="controller">
+      <button id="snap">Capture</button>
+    </div>  
+  </div>
 
-<!-- Trigger canvas web API -->
-<div class="controller">
-    <button id="snap">Capture</button>
-</div>
-
+<div class="col-md-6">
 <!-- Webcam video snapshot -->
-<canvas id="canvas" width="640" height="480"></canvas>
-
-<button id="save">Save</button>
+<canvas id="canvas" width="200" height="200"></canvas>
+<g:form action="saveImage" id="saveSnapForm" name="saveSnapForm"><div hidden="">
+<img id="snapToSave" name="snapToSave" src="" /></div>
+<input hidden="" id="snapURL" name="snapURL" type="text" />
+<button id="save" type="submit">save</button> 
+</g:form>
+</div>
 
 <script>
 	'use strict';
 
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const snap = document.getElementById("snap");
-const errorMsgElement = document.querySelector('span#errorMsg');
-const button = document.getElementById('save');
-
 const constraints = {
   audio: true,
   video: {
-    width: 1280, height: 720
+    width: 200, height: 200
   }
 };
 
@@ -55,48 +50,49 @@ function handleSuccess(stream) {
 // Load init
 init();
 // Draw image
-var context = canvas.getContext('2d');
+    // Grab elements, create settings, etc.
+    var canvas = document.getElementById("canvas"),
+        context = canvas.getContext("2d"),
+        video = document.getElementById("video"),
+        videoObj = { "video": true },
+        errBack = function(error) {
+            console.log("Video capture error: ", error.code); 
+        };
 
-snap.addEventListener("click", function() {
-	context.drawImage(video, 0, 0, 300, 300);
+//var image =  document.getElementById("snapToSave");
+var snapURL;
+//Function to capture image in canvas
+document.getElementById("snap").addEventListener("click", function() {
+    var canvas = document.getElementById("canvas"),
+    context = canvas.getContext("2d"),
+    video = document.getElementById("video");
+    context.drawImage(video, 0, 0, 200, 200);
+    var image =  document.getElementById("snapToSave");
+    image.src = canvas.toDataURL("image/png");
+    snapURL = image.src;
+    document.getElementById("snapURL").value=canvas.toDataURL("image/png");
+    console.log("** THIS IS IMAGE SOURCE:" + image.src);
+
 });
 
-var imgdata = canvas.toDataURL('image/png');
-// modify the dataUrl so the browser starts downloading it instead of just showing it
-var newdata = imgdata.replace(/^data:image\/png/,'data:application/octet-stream');
-
-console.log("canvas to datURL:" + imgdata);
-console.log("new data post imgdata.replace:" + newdata);
-
+const button = document.getElementById('save');
 button.addEventListener('click', async _ => {
-  try {     
-    const response = await fetch('/captureImage', {
-      method: 'post',
-      body: {
-               newdata
-      }
-    });
-    console.log('Completed!', response);
-  } catch(err) {
-    console.error(`Error: ${err}`);
+  var base64dataurl=document.getElementById("canvas").toDataURL();
+  console.log("This is base64dataurl:" + base64dataurl);
+  
+  fetch('/captureImage', {
+  method: 'POST', // or 'PUT'
+  body: JSON.stringify({url: base64dataurl}) , // data can be `string` or {object}!
+  headers:{
+    'Content-Type': 'application/json'
   }
+}).then(res => res.json())
+.then(response => console.log('Success:', JSON.stringify(response)))
+.catch(error => console.error('Error:', error));
+
+
 });
 
 </script>
 
-
-
-<!--
-<div class="container" id="Cool" ng-app="mainApp" ng-controller="formController">
-	<h2>Capture your image from webcam</h2>
-	<div class="row">
-		<div class="col-md-6">
-			<video controls autoplay></video>
-		</div>
-		<div class="col-md-6"></div>
-			<canvas id="myCanvas" width="200" height="200" style="border:1px solid">
-		</div>
-	</div>
-
 </div>
--->
