@@ -38,8 +38,8 @@ app.use(methodOverride('_method'));
 //AWS Configuration
 
 const s3 = new AWS.S3({
-    accessKeyId: 'AKIA5KEOSSMYAVJ6JLHG',
-    secretAccessKey: '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'
+    accessKeyId: env.var.accesskey,
+    secretAccessKey: env.var.secretkey
 });
 
 
