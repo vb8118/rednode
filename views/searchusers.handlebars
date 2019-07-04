@@ -1,7 +1,18 @@
 <div class="jumbotron">
 
-<h1>Capture Image</h1>
+<h3>Add User</h3>
 {{#if error}} <span>{{error}}</span>{{/if}}
+
+  <div class=row>
+    <div class="column">
+  <h5>First name:</h5>
+  <input type="text" name="firstname" id="fname" >
+  </div>
+  <div class="column">
+  <h5>Last name:</h5>
+  <input type="text" name="lastname" id="lname">
+  </div>
+  </div>
 
 <!-- Stream video via webcam -->
 <div class="row">
@@ -13,14 +24,14 @@
     </div>  
   </div>
 
-<div class="col-md-6">
-<!-- Webcam video snapshot -->
-<canvas id="canvas" width="200" height="200"></canvas>
-<g:form action="saveImage" id="saveSnapForm" name="saveSnapForm"><div hidden="">
-<img id="snapToSave" name="snapToSave" src="" /></div>
-<input hidden="" id="snapURL" name="snapURL" type="text" />
-<button id="save" type="submit">save</button> 
-</g:form>
+  <div class="col-md-6">
+  <!-- Webcam video snapshot -->
+  <canvas id="canvas" width="200" height="200"></canvas>
+      <g:form action="saveImage" id="saveSnapForm" name="saveSnapForm"><div hidden="">
+      <img id="snapToSave" name="snapToSave" src="" /></div>
+      <input hidden="" id="snapURL" name="snapURL" type="text" />
+      <button id="save" type="submit">save</button> 
+    </g:form>
 </div>
 
 <script>
@@ -78,11 +89,14 @@ document.getElementById("snap").addEventListener("click", function() {
 const button = document.getElementById('save');
 button.addEventListener('click', async _ => {
   var base64dataurl=document.getElementById("canvas").toDataURL();
+  var fname=document.getElementById("fname").value;
+  var lname=document.getElementById("lname").value;
+
   console.log("This is base64dataurl:" + base64dataurl);
   
   fetch('/captureImage', {
   method: 'POST', // or 'PUT'
-  body: JSON.stringify({url: base64dataurl}) , // data can be `string` or {object}!
+  body: JSON.stringify({url: base64dataurl, fname: fname, lname: lname}) , // data can be `string` or {object}!
   headers:{
     'Content-Type': 'application/json'
   }

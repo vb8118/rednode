@@ -7,6 +7,7 @@ var redis = require('redis');
 var morgan = require('morgan');
 var fs = require('file-system');
 var base64ToImage = require('base64-to-image');
+const AWS = require('aws-sdk');
 
 //set port
 const port = 3001;
@@ -34,10 +35,23 @@ app.use (bodyparser.urlencoded({extended:false}));
 //methooverride
 app.use(methodOverride('_method'));
 
+//AWS Configuration
+
+const s3 = new AWS.S3({
+    accessKeyId: 'AKIA5KEOSSMYAVJ6JLHG',
+    secretAccessKey: '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'
+});
+
+
 //HomePage
 app.get('/', function(req, res, next){
 	res.render('searchusers');
 });
+
+app.get('/user/add', function(req, res, next){
+	res.render('searchusers');
+});
+
 
 //Search User
 app.post('/user/search', function(req, res, next){
@@ -94,16 +108,46 @@ app.get('/captureImage', function(req, res, next) {
 
 app.post('/captureImage', function(req, res, next) {
 	var postData = req.body.url;
+	var nameFirst = req.body.fname;
+	var nameLast = req.body.lname;
 	//console.log("FormData "+ postData);
+	console.log("First Name:" + nameFirst);
+	console.log("Last Name:" + nameLast);
 	//var buff = new Buffer(postData, 'base64');
 //	let text = buff.toString('ascii');
 
 var base64Str = postData;
 var path ='uploads/';
-var optionalObj = {'fileName': 'out', 'type':'png'};
+var fileNamePat = 'image-' + nameFirst + '-' + nameLast;
+var optionalObj = {'fileName': fileNamePat, 'type':'jpg'};
+var localFile = path+'/'+fileNamePat+'.jpg';
 
 base64ToImage(base64Str,path,optionalObj);
 
+
+
+//configuring parameters
+var params = {
+	Bucket: 'newfaceindex',
+	Body : fs.createReadStream(localFile),
+	Key : fileNamePat+"."+Date.now()+".jpg"
+  };
+
+
+const uploadFile = () => {
+	   s3.upload(params, function(s3Err, data) {
+		   if (s3Err) {
+			   console.log(`File uploaded successfully at ${data.Location}`)
+		   }
+			 //success
+  			if (data) {
+				console.log("Uploaded in:", data.Location);
+				res.send(JSON.stringify({'status': 1, 'msg': 'Image Uploaded in:'+data.Location}));
+  			}
+	   });
+  };
+
+  uploadFile();
 
 //	var base64Data = req.body.url.replace(/^data:image\/png;base64,/, "");
 //	fs.writeFile("uploads/out.png", base64Data, 'base64', function(err) {
